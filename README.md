@@ -16,9 +16,9 @@ ClaimAssistant does not replace human claims examiners. It assists them by prepa
 - Claim intake API
 - Pydantic request and response validation
 - Structured claim intake schema
-- Structured next workflow steps returned after claim intake
 - Health check endpoint using a dedicated API router
 - Claim service layer for business logic separation
+- Claim workflow state model for future agent orchestration
 - Modular production-style folder structure
 
 ## Planned Features
