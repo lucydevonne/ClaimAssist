@@ -16,6 +16,7 @@ ClaimAssistant does not replace human claims examiners. It assists them by prepa
 - Claim intake API
 - Pydantic request and response validation
 - Structured claim intake schema
+- Structured next workflow steps returned after claim intake
 - Health check endpoint
 - Modular production-style folder structure
 
@@ -141,6 +142,11 @@ Example response:
   "claim_id": "CLM-AB12CD34",
   "status": "intake_received",
   "message": "Claim intake received for workers_compensation."
+  "next_steps": [
+    "Start document review workflow.",
+    "Retrieve relevant policy and SOP guidance.",
+    "Route claim to risk and severity analysis."
+  ]
 }
 ```
 
