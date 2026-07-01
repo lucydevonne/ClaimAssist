@@ -18,6 +18,7 @@ ClaimAssistant does not replace human claims examiners. It assists them by prepa
 - Structured claim intake schema
 - Structured next workflow steps returned after claim intake
 - Health check endpoint using a dedicated API router
+- Claim service layer for business logic separation
 - Modular production-style folder structure
 
 ## Planned Features
@@ -41,6 +42,11 @@ Input Layer
 
 Schema Layer
   Pydantic validation models
+
+Service Layer
+  Claim intake business logic
+  Claim ID generation
+  Initial workflow step preparation
 
 Planning and Reasoning Layer
   LangGraph workflow orchestration
@@ -179,7 +185,7 @@ ClaimAssistant/
 
 This project is currently in active development.
 
-The first completed layer is the claim intake API with structured schema validation and API routers.
+Completed claim intake API with structured schema validation, API routers and service-layer.
 
 ## Next Milestones
 
