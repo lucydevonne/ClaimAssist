@@ -10,6 +10,7 @@ Evidence:
 - FastAPI uses Pydantic models for request and response bodies.
 """
 
+from datetime import date
 from enum import Enum
 from pydantic import BaseModel, Field
 
@@ -35,10 +36,9 @@ class ClaimIntakeRequest(BaseModel):
         ...,
         description="Type of insurance claim being submitted.",
     )
-    date_of_loss: str = Field(
+    date_of_loss: date = Field(
         ...,
-        description="Date when the incident occurred. MVP uses string format first.",
-        examples=["2026-06-12"],
+        description="Date when the claim incident occurred.",
     )
     incident_description: str = Field(
         ...,
@@ -53,3 +53,4 @@ class ClaimIntakeResponse(BaseModel):
     claim_id: str = Field(..., description="System-generated claim identifier.")
     status: str = Field(..., description="Current claim workflow status.")
     message: str = Field(..., description="Human-readable status message.")
+    next_steps: list[str] = Field(..., description="List of next steps for the claim.")

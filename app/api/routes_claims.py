@@ -30,4 +30,9 @@ def create_claim(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
         claim_id=claim_id,
         status="intake_received",
         message=f"Claim intake received for {request.claim_type}.",
-    )
+        next_steps=[
+        "Start document review workflow.",
+        "Retrieve relevant policy and SOP guidance.",
+        "Route claim to risk and severity analysis.",
+    ],
+)
