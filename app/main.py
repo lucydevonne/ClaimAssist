@@ -7,6 +7,7 @@ This file creates the FastAPI app and connects API routers.
 from fastapi import FastAPI
 
 from app.api.routes_claims import router as claims_router
+from app.api.routes_health import router as health_router
 
 
 app = FastAPI(
@@ -19,14 +20,4 @@ app = FastAPI(
 )
 
 app.include_router(claims_router)
-
-
-@app.get("/health", tags=["health"])
-def health_check():
-    """Return service health status."""
-
-    return {
-        "status": "healthy",
-        "service": "ClaimAssistant",
-        "version": "0.1.0",
-    }
+app.include_router(health_router)
