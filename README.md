@@ -17,7 +17,7 @@ ClaimAssistant does not replace human claims examiners. It assists them by prepa
 - Pydantic request and response validation
 - Structured claim intake schema
 - Structured next workflow steps returned after claim intake
-- Health check endpoint
+- Health check endpoint using a dedicated API router
 - Modular production-style folder structure
 
 ## Planned Features
@@ -141,7 +141,7 @@ Example response:
 {
   "claim_id": "CLM-AB12CD34",
   "status": "intake_received",
-  "message": "Claim intake received for workers_compensation."
+  "message": "Claim intake received for workers_compensation.",
   "next_steps": [
     "Start document review workflow.",
     "Retrieve relevant policy and SOP guidance.",
@@ -179,7 +179,7 @@ ClaimAssistant/
 
 This project is currently in active development.
 
-The first completed layer is the claim intake API with structured schema validation.
+The first completed layer is the claim intake API with structured schema validation and API routers.
 
 ## Next Milestones
 
