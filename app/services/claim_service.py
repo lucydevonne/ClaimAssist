@@ -7,6 +7,7 @@ API routes should call this layer instead of handling business logic directly.
 
 from uuid import uuid4
 
+from app.agents.intake_agent import create_initial_claim_state
 from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse
 
 
@@ -20,6 +21,11 @@ def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
     """
 
     claim_id = f"CLM-{uuid4().hex[:8].upper()}"
+    
+        initial_state = create_initial_claim_state(
+        claim_id=claim_id,
+        request=request,
+    )
 
     return ClaimIntakeResponse(
         claim_id=claim_id,

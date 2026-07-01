@@ -12,14 +12,13 @@ ClaimAssistant does not replace human claims examiners. It assists them by prepa
 
 ## Current Features
 
-- FastAPI backend service
-- Claim intake API
-- Pydantic request and response validation
-- Structured claim intake schema
-- Health check endpoint using a dedicated API router
-- Claim service layer for business logic separation
-- Claim workflow state model for future agent orchestration
-- Modular production-style folder structure
+- FastAPI backend with dedicated API routing for claim intake and health checks
+- Pydantic schemas for structured request and response validation
+- Claim intake workflow with generated claim IDs, status tracking, and next-step responses
+- Service layer separating API routing from claim business logic
+- Initial intake agent that converts validated claim data into workflow state
+- Workflow state model for future LangGraph-based agent orchestration
+- Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 
 ## Planned Features
 
