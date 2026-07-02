@@ -4,33 +4,28 @@ Database session configuration for ClaimAssistant.
 This module defines the SQLAlchemy database engine and session factory.
 
 Current behavior:
-- Reads the database URL from an environment variable.
+- Reads the database URL from the centralized settings object.
 - Creates a SQLAlchemy engine.
 - Creates a reusable session factory.
 - Provides a database session generator for future API/service use.
 
 Future production behavior:
-- Connect to PostgreSQL using DATABASE_URL.
+- Connect to PostgreSQL using environment-specific DATABASE_URL values.
 - Persist claims, audit logs, workflow state, and agent outputs.
 - Use this session layer inside services and repositories.
 - Support migrations through Alembic.
 """
 
-import os
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+psycopg2://postgres:postgres@localhost:5432/claimassistant",
-)
+from app.core.settings import settings
 
 
 engine = create_engine(
-    DATABASE_URL,
+    settings.database_url,
     pool_pre_ping=True,
 )
 
