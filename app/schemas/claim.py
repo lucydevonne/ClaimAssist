@@ -10,7 +10,7 @@ Evidence:
 - FastAPI uses Pydantic models for request and response bodies.
 """
 
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 from typing import Any
 from pydantic import BaseModel, Field
@@ -143,4 +143,41 @@ class ClaimRecordResponse(BaseModel):
     requires_human_review: bool = Field(
         ...,
         description="Whether the claim requires human examiner review.",
+    )
+    
+class ClaimAuditLogResponse(BaseModel):
+    """
+    Response returned for one audit log linked to a claim.
+
+    Current behavior:
+    - Represents one stored audit event from PostgreSQL.
+
+    Future production behavior:
+    - Include agent name, tool name, model version, trace ID,
+      and human reviewer information.
+    """
+
+    audit_id: str = Field(
+        ...,
+        description="System-generated audit log identifier.",
+    )
+
+    claim_id: str = Field(
+        ...,
+        description="Claim identifier linked to this audit event.",
+    )
+
+    event_type: str = Field(
+        ...,
+        description="Type of workflow, agent, tool, or decision event.",
+    )
+
+    details: dict[str, Any] = Field(
+        ...,
+        description="Structured event details stored for traceability.",
+    )
+
+    created_at: datetime = Field(
+        ...,
+        description="Timestamp when the audit event was created.",
     )

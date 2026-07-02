@@ -11,9 +11,9 @@ from sqlalchemy.orm import Session
 
 from app.agents.intake_agent import create_initial_claim_state
 from app.graph.workflow import run_claim_workflow
-from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse
+from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse
 
-from app.repositories.audit_repository import create_audit_log_record
+from app.repositories.audit_repository import create_audit_log_record, get_audit_logs_by_claim_id
 from app.repositories.claim_repository import create_claim_record, get_claim_record_by_id
 
 from app.services.audit_service import create_audit_event
@@ -143,3 +143,36 @@ def get_claim_by_id(
         recommended_action=claim.recommended_action,
         requires_human_review=claim.requires_human_review,
     )
+    
+def get_claim_audit_logs(
+    claim_id: str,
+    db: Session,
+) -> list[ClaimAuditLogResponse]:
+    """
+    Retrieve audit logs for a stored claim.
+
+    Current behavior:
+    - Calls the audit repository to fetch PostgreSQL audit records.
+    - Converts database models into API response schemas.
+
+    Future production behavior:
+    - Return a complete workflow timeline for examiner review.
+    - Include model prompts, tool calls, retrieved policy chunks,
+      and human override decisions where appropriate.
+    """
+
+    audit_logs = get_audit_logs_by_claim_id(
+        db=db,
+        claim_id=claim_id,
+    )
+
+    return [
+        ClaimAuditLogResponse(
+            audit_id=audit_log.id,
+            claim_id=audit_log.claim_id,
+            event_type=audit_log.event_type,
+            details=audit_log.details,
+            created_at=audit_log.created_at,
+        )
+        for audit_log in audit_logs
+    ]
