@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     """
     Typed application settings loaded from environment variables.
 
-    BaseSettings allows ClaimAssistant to read configuration from the
+    BaseSettings allows ClaimAssist to read configuration from the
     environment while still validating expected types.
 
     Example:
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     """
 
     app_name: str = Field(
-        default="ClaimAssistant",
+        default="ClaimAssist",
         description="Human-readable application name.",
     )
 
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     )
 
     database_url: str = Field(
-        default="postgresql+psycopg2://postgres:postgres@localhost:5432/claimassistant",
+        default="postgresql+psycopg2://postgres:postgres@localhost:5432/claimassist",
         description="SQLAlchemy database connection URL.",
     )
 
