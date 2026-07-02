@@ -1,5 +1,7 @@
 # ClaimAssist
 
+![ClaimAssist Tests](https://github.com/lucydevonne/ClaimAssist/actions/workflows/tests.yml/badge.svg)
+
 ClaimAssist is a production-style agentic AI claims assistant designed to support insurance claim workflows.
 
 The system is built to handle claim intake, policy interpretation, document review, risk analysis, next-best-action recommendations, human-in-the-loop review, and audit logging.
