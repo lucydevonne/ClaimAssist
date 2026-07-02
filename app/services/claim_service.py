@@ -9,7 +9,7 @@ from uuid import uuid4
 
 from app.agents.intake_agent import create_initial_claim_state
 from app.graph.workflow import run_claim_workflow
-from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse
+from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse
 
 
 def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
@@ -39,4 +39,30 @@ def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
             "Retrieve relevant policy and SOP guidance.",
             "Route claim to risk and severity analysis.",
         ],
+    )
+    
+def create_claim_decision(request: ClaimIntakeRequest) -> ClaimDecisionResponse:
+    """
+    Run the claim workflow and return a decision-style response.
+
+    This function is used when the caller wants the workflow output,
+    not just the initial intake confirmation.
+    """
+
+    claim_id = f"CLM-{uuid4().hex[:8].upper()}"
+
+    initial_state = create_initial_claim_state(
+        claim_id=claim_id,
+        request=request,
+    )
+
+    workflow_state = run_claim_workflow(initial_state)
+
+    return ClaimDecisionResponse(
+        claim_id=workflow_state.claim_id,
+        status=workflow_state.status,
+        risk_level=workflow_state.risk_level,
+        recommended_action=workflow_state.recommended_action,
+        requires_human_review=workflow_state.requires_human_review,
+        summary="Claim workflow completed and recommendation generated.",
     )

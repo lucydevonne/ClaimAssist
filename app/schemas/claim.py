@@ -53,4 +53,37 @@ class ClaimIntakeResponse(BaseModel):
     claim_id: str = Field(..., description="System-generated claim identifier.")
     status: str = Field(..., description="Current claim workflow status.")
     message: str = Field(..., description="Human-readable status message.")
-    next_steps: list[str] = Field(..., description="List of next steps for the claim.")
+   
+    
+class ClaimDecisionResponse(BaseModel):
+    """Response returned after the claim workflow produces a recommendation."""
+
+    claim_id: str = Field(
+        ...,
+        description="System-generated claim identifier.",
+    )
+
+    status: str = Field(
+        ...,
+        description="Current claim workflow status.",
+    )
+
+    risk_level: str | None = Field(
+        default=None,
+        description="Risk or severity level assigned during claim review.",
+    )
+
+    recommended_action: str | None = Field(
+        default=None,
+        description="Recommended next best action for the claim.",
+    )
+
+    requires_human_review: bool = Field(
+        ...,
+        description="Whether the claim requires review by a human examiner.",
+    )
+
+    summary: str = Field(
+        ...,
+        description="Short summary of the workflow outcome.",
+    )
