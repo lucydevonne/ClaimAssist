@@ -52,6 +52,11 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
     )
+    
+    test_database_url: str = Field(
+    default="postgresql+psycopg2://postgres:postgres@localhost:5432/claimassist_test",
+    description="SQLAlchemy database connection URL used for automated tests.",
+)
 
 
 settings = Settings()

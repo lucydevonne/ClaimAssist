@@ -14,15 +14,10 @@ Future production behavior:
 - Add test database fixtures so PostgreSQL tests do not touch local dev data.
 """
 
-from fastapi.testclient import TestClient
-
-from app.main import app
 
 
-client = TestClient(app)
 
-
-def test_health_check_returns_healthy_status() -> None:
+def test_health_check_returns_healthy_status(client) -> None:
     """
     Verify that the health endpoint confirms the API is running.
 
@@ -39,7 +34,7 @@ def test_health_check_returns_healthy_status() -> None:
     }
 
 
-def test_create_claim_returns_intake_response() -> None:
+def test_create_claim_returns_intake_response(client) -> None:
     """
     Verify that claim intake returns a structured response.
 

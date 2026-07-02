@@ -13,7 +13,7 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_create_claim_decision_returns_workflow_output() -> None:
+def test_create_claim_decision_returns_workflow_output(client) -> None:
     """
     Verify that the decision endpoint returns workflow results.
     """
