@@ -1,5 +1,5 @@
 """
-Claim service layer for ClaimAssistant.
+Claim service layer for ClaimAssist.
 
 The service layer contains business logic for claim operations.
 API routes should call this layer instead of handling business logic directly.
@@ -7,23 +7,34 @@ API routes should call this layer instead of handling business logic directly.
 
 from uuid import uuid4
 
-from app.services.audit_service import create_audit_event
+from sqlalchemy.orm import Session
+
 from app.agents.intake_agent import create_initial_claim_state
 from app.graph.workflow import run_claim_workflow
 from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse
 
+from app.repositories.audit_repository import create_audit_log_record
+from app.repositories.claim_repository import create_claim_record
+
+from app.services.audit_service import create_audit_event
 
 def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
     """
     Create a new claim intake response.
 
-    For the current version, this function generates a claim ID and returns
-    the first workflow steps. Later, this function will save the claim to
-    the database and trigger the LangGraph workflow.
+    Current behavior:
+    - Generates a claim ID.
+    - Creates the initial workflow state.
+    - Returns a structured intake response.
+
+    Future production behavior:
+    - Save the raw claim intake record to PostgreSQL.
+    - Trigger the LangGraph workflow asynchronously.
+    - Persist an intake audit event.
     """
 
     claim_id = f"CLM-{uuid4().hex[:8].upper()}"
-    
+
     initial_state = create_initial_claim_state(
         claim_id=claim_id,
         request=request,
@@ -42,12 +53,23 @@ def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
         ],
     )
     
-def create_claim_decision(request: ClaimIntakeRequest) -> ClaimDecisionResponse:
+def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDecisionResponse:
     """
     Run the claim workflow and return a decision-style response.
 
-    This function is used when the caller wants the workflow output,
-    not just the initial intake confirmation.
+    Current behavior:
+    - Generates a claim ID.
+    - Creates the initial workflow state.
+    - Runs the current agent workflow.
+    - Saves the completed claim state to PostgreSQL.
+    - Creates and saves an audit event to PostgreSQL.
+    - Returns the decision response.
+
+    Future production behavior:
+    - Persist every intermediate workflow state transition.
+    - Store every agent and tool execution as an audit log.
+    - Trigger long-running workflows through LangGraph.
+    - Add rollback handling so claim and audit writes stay consistent.
     """
 
     claim_id = f"CLM-{uuid4().hex[:8].upper()}"
@@ -58,8 +80,12 @@ def create_claim_decision(request: ClaimIntakeRequest) -> ClaimDecisionResponse:
     )
 
     workflow_state = run_claim_workflow(initial_state)
-    
-    
+
+    create_claim_record(
+        db=db,
+        state=workflow_state,
+    )
+
     audit_event = create_audit_event(
     claim_id=workflow_state.claim_id,
     event_type="claim_decision_generated",
