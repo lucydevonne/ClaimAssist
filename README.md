@@ -1,6 +1,6 @@
-# ClaimAssistant
+# ClaimAssist
 
-ClaimAssistant is a production-style agentic AI claims assistant designed to support insurance claim workflows.
+ClaimAssist is a production-style agentic AI claims assistant designed to support insurance claim workflows.
 
 The system is built to handle claim intake, policy interpretation, document review, risk analysis, next-best-action recommendations, human-in-the-loop review, and audit logging.
 
@@ -8,7 +8,7 @@ The system is built to handle claim intake, policy interpretation, document revi
 
 This project demonstrates how LLM-powered and agentic AI systems can support claims professionals by reducing manual review time, improving consistency, and helping adjusters make evidence-based decisions.
 
-ClaimAssistant does not replace human claims examiners. It assists them by preparing structured claim summaries, retrieving relevant policy guidance, identifying risk indicators, and recommending the next best action with human oversight.
+ClaimAssist does not replace human claims examiners. It assists them by preparing structured claim summaries, retrieving relevant policy guidance, identifying risk indicators, and recommending the next best action with human oversight.
 
 ## Current Features
 
@@ -160,7 +160,7 @@ Example response:
 ## Project Structure
 
 ```text
-ClaimAssistant/
+ClaimAssist/
   app/
     api/
     agents/
