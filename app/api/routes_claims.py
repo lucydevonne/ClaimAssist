@@ -117,7 +117,7 @@ def read_claim_audit_logs(
         db=db,
     )
     
-    @router.post("/{claim_id}/human-review", response_model=HumanReviewResponse)
+@router.post("/{claim_id}/human-review", response_model=HumanReviewResponse)
 def submit_human_review(
     claim_id: str,
     request: HumanReviewRequest,
