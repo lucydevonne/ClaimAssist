@@ -26,6 +26,8 @@ def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
         claim_id=claim_id,
         request=request,
     )
+        
+ workflow_state = run_claim_workflow(initial_state)
 
     return ClaimIntakeResponse(
         claim_id=claim_id,
