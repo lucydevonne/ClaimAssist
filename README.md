@@ -19,7 +19,7 @@ ClaimAssist does not replace human claims examiners. It assists them by preparin
 - Initial intake, document, policy review, risk analysis and resolution recommendation agents integrated into the claim workflow
 - Decision response endpoint exposing risk level, recommended action, and human review requirement
 - Audit service for structured workflow event logging
-- Database model layer prepared for claims, audit logs, and future PostgreSQL persistence
+- Database layer prepared for PostgreSQL persistence, including models, sessions, and repository patterns
 - Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 
 ## Planned Features
