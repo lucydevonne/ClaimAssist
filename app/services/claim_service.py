@@ -22,6 +22,8 @@ from app.observability.logging_config import get_logger
 
 from app.guardrails.input_validation import validate_claim_input
 
+from app.guardrails.output_validation import validate_workflow_output
+
 logger = get_logger(__name__)
 
 def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
@@ -49,6 +51,8 @@ def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
     )
         
     workflow_state = run_claim_workflow(initial_state)
+    
+    validate_workflow_output(workflow_state)
 
     return ClaimIntakeResponse(
         claim_id=claim_id,

@@ -94,3 +94,38 @@ def test_create_claim_decision_persists_claim_and_audit_log(
     assert saved_audit_log is not None
     assert saved_audit_log.claim_id == claim_id
     assert saved_audit_log.event_type == "claim_decision_generated"
+    
+
+def test_claim_decision_routes_high_risk_claim_to_human_review(client) -> None:
+    """
+    Verify that high-risk claim outputs require human review.
+
+    Current behavior:
+    - Sends a high-risk claim description.
+    - Confirms the workflow returns high risk.
+    - Confirms human review is required.
+
+    Future production behavior:
+    - Validate policy-based escalation rules.
+    - Confirm high-risk outputs cannot bypass examiner review.
+    """
+
+    payload = {
+        "claimant_name": "Jane Doe",
+        "claim_type": "workers_compensation",
+        "date_of_loss": "2026-07-02",
+        "incident_description": (
+            "Employee reported severe back injury, hospitalization, "
+            "and possible surgery after a workplace incident."
+        ),
+    }
+
+    response = client.post("/claims/decision", json=payload)
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["risk_level"] == "high"
+    assert data["requires_human_review"] is True
+    assert data["recommended_action"] == (
+        "Escalate to a senior claims examiner for manual review."
+    )

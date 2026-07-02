@@ -52,7 +52,10 @@ def create_claim_decision_response(
     recommended action, and human review requirement.
     """
     try:
-        return create_claim_decision(request=request, db=db)
+        return create_claim_decision(
+            request=request,
+            db=db,
+        )
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
     
