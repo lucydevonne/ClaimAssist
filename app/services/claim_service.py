@@ -20,6 +20,8 @@ from app.services.audit_service import create_audit_event
 
 from app.observability.logging_config import get_logger
 
+from app.guardrails.input_validation import validate_claim_input
+
 logger = get_logger(__name__)
 
 def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
@@ -37,6 +39,8 @@ def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
     - Persist an intake audit event.
     """
 
+    validate_claim_input(request)
+    
     claim_id = f"CLM-{uuid4().hex[:8].upper()}"
 
     initial_state = create_initial_claim_state(
@@ -76,6 +80,8 @@ def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDec
     - Add rollback handling so claim and audit writes stay consistent.
     """
 
+    validate_claim_input(request)
+    
     claim_id = f"CLM-{uuid4().hex[:8].upper()}"
     
     logger.info("claim_decision_workflow_started claim_id=%s", claim_id)

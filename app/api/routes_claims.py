@@ -35,7 +35,10 @@ def create_claim(request: ClaimIntakeRequest, db: Session = Depends(get_db_sessi
     - This endpoint will support authenticated examiner workflows.
     - It will persist claim decisions, audit logs, and workflow traces.
     """
-    return create_claim_intake(request)
+    try:
+        return create_claim_intake(request)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 @router.post("/decision", response_model=ClaimDecisionResponse)
 def create_claim_decision_response(
@@ -48,8 +51,11 @@ def create_claim_decision_response(
     This endpoint runs the current agent workflow and exposes the risk level,
     recommended action, and human review requirement.
     """
-
-    return create_claim_decision(request, db)
+    try:
+        return create_claim_decision(request=request, db=db)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    
 
 @router.get("/{claim_id}", response_model=ClaimRecordResponse)
 def read_claim(

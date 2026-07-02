@@ -23,18 +23,11 @@ ClaimAssist does not replace human claims examiners. It assists them by preparin
 - Database layer for PostgreSQL persistence, including models, sessions, settings, repositories, and migrations
 - Automated testing setup with pytest, test database fixtures, and GitHub Actions CI
 - Observability layer prepared for structured workflow logging and future OpenTelemetry integration
+- Guardrail layer prepared for input validation, prompt-injection checks, and future safety controls
 - Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 
 ## Planned Features
 
-- LangGraph workflow orchestration
-- Multi-agent claims review system
-- RAG over policy and SOP documents
-- Document intelligence for claim notes and medical documents
-- Risk and severity analysis agent
-- Human-in-the-loop review checkpoint
-- Guardrails and structured output validation
-- Audit logs for agent decisions and tool calls
 - Evaluation framework for retrieval and reasoning quality
 - Docker and Kubernetes deployment support
 
