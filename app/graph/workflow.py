@@ -9,6 +9,7 @@ and human-in-the-loop decision support.
 from app.agents.document_agent import review_claim_documents
 from app.agents.policy_agent import review_policy_guidance
 from app.agents.risk_agent import analyze_claim_risk
+from app.agents.resolution_agent import recommend_claim_resolution
 from app.graph.state import ClaimWorkflowState
 
 
@@ -21,11 +22,13 @@ def run_claim_workflow(initial_state: ClaimWorkflowState) -> ClaimWorkflowState:
     2. Run document review agent.
     3. Run policy review agent.
     4. Run risk analysis agent.
-    5. Return updated workflow state.
+    5. Run resolution recommendation agent.
+    6. Return updated workflow state.
     """
 
     workflow_state = review_claim_documents(initial_state)
     workflow_state = review_policy_guidance(workflow_state)
     workflow_state = analyze_claim_risk(workflow_state)
+    workflow_state = recommend_claim_resolution(workflow_state)
     
     return workflow_state
