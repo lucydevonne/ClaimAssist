@@ -18,6 +18,10 @@ from app.repositories.claim_repository import create_claim_record, get_claim_rec
 
 from app.services.audit_service import create_audit_event
 
+from app.observability.logging_config import get_logger
+
+logger = get_logger(__name__)
+
 def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
     """
     Create a new claim intake response.
@@ -73,6 +77,8 @@ def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDec
     """
 
     claim_id = f"CLM-{uuid4().hex[:8].upper()}"
+    
+    logger.info("claim_decision_workflow_started claim_id=%s", claim_id)
 
     initial_state = create_initial_claim_state(
         claim_id=claim_id,
@@ -80,6 +86,14 @@ def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDec
     )
 
     workflow_state = run_claim_workflow(initial_state)
+    
+    logger.info(
+    "claim_decision_workflow_completed claim_id=%s status=%s risk_level=%s requires_human_review=%s",
+    workflow_state.claim_id,
+    workflow_state.status,
+    workflow_state.risk_level,
+    workflow_state.requires_human_review,
+    )
 
     create_claim_record(
         db=db,
@@ -100,6 +114,12 @@ def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDec
     create_audit_log_record(
         db=db,
         audit_event=audit_event,
+    )
+    
+    logger.info(
+    "claim_decision_persisted claim_id=%s event_type=%s",
+    workflow_state.claim_id,
+    audit_event["event_type"],
     )
 
     return ClaimDecisionResponse(

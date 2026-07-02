@@ -9,6 +9,10 @@ from fastapi import FastAPI
 from app.api.routes_claims import router as claims_router
 from app.api.routes_health import router as health_router
 
+from app.observability.logging_config import configure_logging
+
+configure_logging()
+
 
 app = FastAPI(
     title="ClaimAssistant",

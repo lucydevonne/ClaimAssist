@@ -14,15 +14,15 @@ ClaimAssist does not replace human claims examiners. It assists them by preparin
 
 ## Current Features
 
-- FastAPI backend with dedicated API routing for claim intake and health checks
+- FastAPI backend with dedicated API routing for claim intake, decisions, retrieval, and health checks
 - Pydantic schemas for structured request and response validation
-- Claim intake workflow with generated claim IDs, status tracking, and next-step responses
+- Claim intake and decision workflow with generated claim IDs, status tracking, next-step responses, and decision outputs
 - Service layer separating API routing from claim business logic
-- Initial intake, document, policy review, risk analysis and resolution recommendation agents integrated into the claim workflow
-- Decision response endpoint exposing risk level, recommended action, and human review requirement
-- Audit service for structured workflow event logging
-- Database layer prepared for PostgreSQL persistence, including models, sessions, settings, repositories, and migrations
-- Automated testing setup with pytest and GitHub Actions CI
+- Initial intake, document review, policy review, risk analysis, and resolution recommendation agents integrated into the claim workflow
+- Audit service and PostgreSQL-backed audit log persistence for workflow traceability
+- Database layer for PostgreSQL persistence, including models, sessions, settings, repositories, and migrations
+- Automated testing setup with pytest, test database fixtures, and GitHub Actions CI
+- Observability layer prepared for structured workflow logging and future OpenTelemetry integration
 - Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 
 ## Planned Features
