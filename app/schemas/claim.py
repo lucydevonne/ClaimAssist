@@ -12,6 +12,7 @@ Evidence:
 
 from datetime import date
 from enum import Enum
+from typing import Any
 from pydantic import BaseModel, Field
 
 
@@ -86,4 +87,12 @@ class ClaimDecisionResponse(BaseModel):
     summary: str = Field(
         ...,
         description="Short summary of the workflow outcome.",
+    )
+    
+    audit_event: dict[str, Any] = Field(
+        ...,
+        description=(
+            "Structured audit event for the generated decision. "
+            "In production, this will be persisted to PostgreSQL."
+        ),
     )
