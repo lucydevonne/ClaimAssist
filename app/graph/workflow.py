@@ -6,22 +6,20 @@ across claim intake, document review, policy retrieval, risk analysis,
 and human-in-the-loop decision support.
 """
 
+from app.agents.document_agent import review_claim_documents
 from app.graph.state import ClaimWorkflowState
 
 
-def run_claim_workflow(
-    initial_state: ClaimWorkflowState,
-) -> ClaimWorkflowState:
+def run_claim_workflow(initial_state: ClaimWorkflowState) -> ClaimWorkflowState:
     """
     Run the claim workflow from the initial claim state.
 
-    Current version:
-    - receives the initial state from the intake agent
-    - marks the workflow as ready for document review
-
-    Future version:
-    - will use LangGraph to route the claim through multiple agents
+    Current workflow:
+    1. Receive initial claim state.
+    2. Run document review agent.
+    3. Return updated workflow state.
     """
 
-    initial_state.status = "ready_for_document_review"
-    return initial_state
+    workflow_state = review_claim_documents(initial_state)
+
+    return workflow_state
