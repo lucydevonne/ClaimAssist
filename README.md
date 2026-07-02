@@ -20,6 +20,7 @@ ClaimAssist does not replace human claims examiners. It assists them by preparin
 - Decision response endpoint exposing risk level, recommended action, and human review requirement
 - Audit service for structured workflow event logging
 - Database layer prepared for PostgreSQL persistence, including models, sessions, settings, repositories, and migrations
+- Automated testing setup with pytest and GitHub Actions CI
 - Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 
 ## Planned Features
