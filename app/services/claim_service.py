@@ -87,15 +87,20 @@ def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDec
     )
 
     audit_event = create_audit_event(
-    claim_id=workflow_state.claim_id,
-    event_type="claim_decision_generated",
-    details={
-        "status": workflow_state.status,
-        "risk_level": workflow_state.risk_level,
-        "requires_human_review": workflow_state.requires_human_review,
-        "recommended_action": workflow_state.recommended_action,
-    },
-)
+        claim_id=workflow_state.claim_id,
+        event_type="claim_decision_generated",
+        details={
+            "status": workflow_state.status,
+            "risk_level": workflow_state.risk_level,
+            "requires_human_review": workflow_state.requires_human_review,
+            "recommended_action": workflow_state.recommended_action,
+        },
+    )
+
+    create_audit_log_record(
+        db=db,
+        audit_event=audit_event,
+    )
 
     return ClaimDecisionResponse(
         claim_id=workflow_state.claim_id,
