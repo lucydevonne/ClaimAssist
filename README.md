@@ -17,8 +17,9 @@ ClaimAssistant does not replace human claims examiners. It assists them by prepa
 - Claim intake workflow with generated claim IDs, status tracking, and next-step responses
 - Service layer separating API routing from claim business logic
 - Initial intake, document, policy review, risk analysis and resolution recommendation agents integrated into the claim workflow
-- Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 - Decision response endpoint exposing risk level, recommended action, and human review requirement
+- Audit service for structured workflow event logging
+- Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 
 ## Planned Features
 

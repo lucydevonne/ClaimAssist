@@ -7,6 +7,7 @@ API routes should call this layer instead of handling business logic directly.
 
 from uuid import uuid4
 
+from app.services.audit_service import create_audit_event
 from app.agents.intake_agent import create_initial_claim_state
 from app.graph.workflow import run_claim_workflow
 from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse
@@ -29,6 +30,17 @@ def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
     )
         
     workflow_state = run_claim_workflow(initial_state)
+    
+    audit_event = create_audit_event(
+    claim_id=workflow_state.claim_id,
+    event_type="claim_decision_generated",
+    details={
+        "status": workflow_state.status,
+        "risk_level": workflow_state.risk_level,
+        "requires_human_review": workflow_state.requires_human_review,
+        "recommended_action": workflow_state.recommended_action,
+    },
+)
 
     return ClaimIntakeResponse(
         claim_id=claim_id,
