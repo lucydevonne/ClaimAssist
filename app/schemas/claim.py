@@ -54,7 +54,10 @@ class ClaimIntakeResponse(BaseModel):
     claim_id: str = Field(..., description="System-generated claim identifier.")
     status: str = Field(..., description="Current claim workflow status.")
     message: str = Field(..., description="Human-readable status message.")
-   
+    next_steps: list[str] = Field(
+    ...,
+    description="List of next steps for the claim.",
+)
     
 class ClaimDecisionResponse(BaseModel):
     """Response returned after the claim workflow produces a recommendation."""

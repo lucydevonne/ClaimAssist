@@ -1,5 +1,5 @@
 """
-Health API routes for ClaimAssistant.
+Health API routes for ClaimAssist.
 
 This module exposes service health endpoints used to confirm
 that the API is running.
@@ -17,6 +17,6 @@ def health_check():
 
     return {
         "status": "healthy",
-        "service": "ClaimAssistant",
+        "service": "ClaimAssist",
         "version": "0.1.0",
     }
