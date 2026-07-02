@@ -96,3 +96,51 @@ class ClaimDecisionResponse(BaseModel):
             "In production, this will be persisted to PostgreSQL."
         ),
     )
+    
+class ClaimRecordResponse(BaseModel):
+    """Response returned when reading a stored claim record from PostgreSQL."""
+
+    claim_id: str = Field(
+        ...,
+        description="System-generated claim identifier.",
+    )
+
+    claimant_name: str = Field(
+        ...,
+        description="Name of the person filing or associated with the claim.",
+    )
+
+    claim_type: str = Field(
+        ...,
+        description="Type of insurance claim.",
+    )
+
+    date_of_loss: date = Field(
+        ...,
+        description="Date when the claim incident occurred.",
+    )
+
+    incident_description: str = Field(
+        ...,
+        description="Original claim incident description.",
+    )
+
+    status: str = Field(
+        ...,
+        description="Current claim workflow status.",
+    )
+
+    risk_level: str | None = Field(
+        default=None,
+        description="Risk or severity level assigned during claim review.",
+    )
+
+    recommended_action: str | None = Field(
+        default=None,
+        description="Recommended next best action for the claim.",
+    )
+
+    requires_human_review: bool = Field(
+        ...,
+        description="Whether the claim requires human examiner review.",
+    )

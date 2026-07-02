@@ -9,10 +9,10 @@ and calls services or workflow orchestration.
 from uuid import uuid4
 from fastapi import APIRouter
 
-from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse
-from app.services.claim_service import create_claim_intake, create_claim_decision
+from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse
+from app.services.claim_service import create_claim_intake, create_claim_decision, get_claim_by_id 
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db_session
@@ -50,3 +50,35 @@ def create_claim_decision_response(
     """
 
     return create_claim_decision(request, db)
+
+@router.get("/{claim_id}", response_model=ClaimRecordResponse)
+def read_claim(
+    claim_id: str,
+    db: Session = Depends(get_db_session),
+) -> ClaimRecordResponse:
+    """
+    Retrieve a stored claim record by claim ID.
+
+    Current behavior:
+    - Reads claim_id from the URL path.
+    - Opens a database session through FastAPI dependency injection.
+    - Calls the service layer to fetch the claim from PostgreSQL.
+    - Returns a structured claim record response.
+
+    Future production behavior:
+    - Enforce authenticated examiner access.
+    - Return linked documents, audit logs, and workflow timeline.
+    """
+
+    claim = get_claim_by_id(
+        claim_id=claim_id,
+        db=db,
+    )
+
+    if claim is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Claim not found.",
+        )
+
+    return claim

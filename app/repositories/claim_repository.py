@@ -64,3 +64,28 @@ def create_claim_record(
     db.refresh(claim)
 
     return claim
+
+def get_claim_record_by_id(
+    db: Session,
+    claim_id: str,
+) -> Claim | None:
+    """
+    Retrieve one claim record by claim ID.
+
+    Args:
+        db: Active SQLAlchemy database session.
+        claim_id: Primary key of the claim record.
+
+    Returns:
+        The matching Claim database model if found, otherwise None.
+
+    Current behavior:
+    - Uses SQLAlchemy Session.get() to fetch a claim by primary key.
+
+    Future production behavior:
+    - Add tenant/client-level access control.
+    - Add examiner authorization checks.
+    - Add related workflow state and audit log joins when needed.
+    """
+
+    return db.get(Claim, claim_id)

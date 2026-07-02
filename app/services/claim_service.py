@@ -11,10 +11,10 @@ from sqlalchemy.orm import Session
 
 from app.agents.intake_agent import create_initial_claim_state
 from app.graph.workflow import run_claim_workflow
-from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse
+from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse
 
 from app.repositories.audit_repository import create_audit_log_record
-from app.repositories.claim_repository import create_claim_record
+from app.repositories.claim_repository import create_claim_record, get_claim_record_by_id
 
 from app.services.audit_service import create_audit_event
 
@@ -105,4 +105,41 @@ def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDec
         requires_human_review=workflow_state.requires_human_review,
         summary="Claim workflow completed and recommendation generated.",
         audit_event=audit_event,
+    )
+    
+def get_claim_by_id(
+    claim_id: str,
+    db: Session,
+) -> ClaimRecordResponse | None:
+    """
+    Retrieve a stored claim by claim ID.
+
+    Current behavior:
+    - Calls the claim repository to fetch a PostgreSQL claim record.
+    - Converts the database model into a response schema.
+
+    Future production behavior:
+    - Enforce role-based access control.
+    - Include linked audit logs, documents, and workflow trace data.
+    - Support examiner-facing claim detail views.
+    """
+
+    claim = get_claim_record_by_id(
+        db=db,
+        claim_id=claim_id,
+    )
+
+    if claim is None:
+        return None
+
+    return ClaimRecordResponse(
+        claim_id=claim.id,
+        claimant_name=claim.claimant_name,
+        claim_type=claim.claim_type,
+        date_of_loss=claim.date_of_loss,
+        incident_description=claim.incident_description,
+        status=claim.status,
+        risk_level=claim.risk_level,
+        recommended_action=claim.recommended_action,
+        requires_human_review=claim.requires_human_review,
     )
