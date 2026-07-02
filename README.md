@@ -24,6 +24,7 @@ ClaimAssist does not replace human claims examiners. It assists them by preparin
 - Automated testing setup with pytest, test database fixtures, and GitHub Actions CI
 - Observability layer prepared for structured workflow logging and future OpenTelemetry integration
 - Guardrail layer prepared for input validation, output validation, prompt-injection checks, and future safety controls
+- Human-in-the-loop review layer prepared for examiner approval, rejection, and escalation workflows
 - Modular production-style architecture for agents, RAG, tools, guardrails, observability, and tests
 
 ## Planned Features

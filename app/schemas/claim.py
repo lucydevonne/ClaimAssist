@@ -184,3 +184,54 @@ class ClaimAuditLogResponse(BaseModel):
         ...,
         description="Timestamp when the audit event was created.",
     )
+    
+
+class HumanReviewAction(str, Enum):
+    """Allowed human review actions for claim decisions."""
+
+    approve = "approve"
+    reject = "reject"
+    escalate = "escalate"
+
+
+class HumanReviewRequest(BaseModel):
+    """
+    Request body for human review decisions.
+
+    Current behavior:
+    - Captures the reviewer's action and notes.
+
+    Future production behavior:
+    - Store reviewer ID from authentication.
+    - Persist override reasons and supervisor approvals.
+    - Link human decisions to the full workflow audit trail.
+    """
+
+    action: HumanReviewAction = Field(
+        ...,
+        description="Human examiner action on the AI recommendation.",
+    )
+
+    reviewer_notes: str = Field(
+        ...,
+        min_length=5,
+        description="Human reviewer notes explaining the decision.",
+    )
+
+
+class HumanReviewResponse(BaseModel):
+    """
+    Response returned after a human review action is recorded.
+
+    Current behavior:
+    - Returns the claim ID, review action, updated status, and notes.
+
+    Future production behavior:
+    - Persist human review decisions to PostgreSQL.
+    - Add reviewer identity, timestamps, and approval chain metadata.
+    """
+
+    claim_id: str = Field(..., description="Claim identifier reviewed.")
+    action: HumanReviewAction = Field(..., description="Recorded review action.")
+    status: str = Field(..., description="Updated claim review status.")
+    reviewer_notes: str = Field(..., description="Notes from the human reviewer.")

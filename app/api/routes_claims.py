@@ -9,8 +9,8 @@ and calls services or workflow orchestration.
 from uuid import uuid4
 from fastapi import APIRouter
 
-from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse
-from app.services.claim_service import create_claim_intake, create_claim_decision, get_claim_by_id, get_claim_audit_logs
+from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse, HumanReviewRequest, HumanReviewResponse
+from app.services.claim_service import create_claim_intake, create_claim_decision, get_claim_by_id, get_claim_audit_logs, record_human_review
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -114,5 +114,32 @@ def read_claim_audit_logs(
 
     return get_claim_audit_logs(
         claim_id=claim_id,
+        db=db,
+    )
+    
+    @router.post("/{claim_id}/human-review", response_model=HumanReviewResponse)
+def submit_human_review(
+    claim_id: str,
+    request: HumanReviewRequest,
+    db: Session = Depends(get_db_session),
+) -> HumanReviewResponse:
+    """
+    Submit a human review decision for a claim.
+
+    Current behavior:
+    - Reads claim_id from the URL path.
+    - Validates the reviewer action and notes.
+    - Returns a structured review response.
+
+    Future production behavior:
+    - Confirm the claim exists in PostgreSQL.
+    - Persist the human review record.
+    - Write a human-review audit event.
+    - Enforce examiner authentication and permissions.
+    """
+
+    return record_human_review(
+        claim_id=claim_id,
+        request=request,
         db=db,
     )

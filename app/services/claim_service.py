@@ -24,6 +24,8 @@ from app.guardrails.input_validation import validate_claim_input
 
 from app.guardrails.output_validation import validate_workflow_output
 
+from app.schemas.claim import HumanReviewRequest, HumanReviewResponse
+
 logger = get_logger(__name__)
 
 def create_claim_intake(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
@@ -211,3 +213,37 @@ def get_claim_audit_logs(
         )
         for audit_log in audit_logs
     ]
+    
+
+def record_human_review(
+    claim_id: str,
+    request: HumanReviewRequest,
+    db: Session,
+) -> HumanReviewResponse:
+    """
+    Record a human review decision for a claim.
+
+    Current behavior:
+    - Accepts a human reviewer action.
+    - Returns a structured human review response.
+
+    Future production behavior:
+    - Fetch the claim from PostgreSQL.
+    - Update claim status based on reviewer action.
+    - Save the human review decision to a human_reviews table.
+    - Create an audit log event for the human review action.
+    """
+
+    if request.action == "approve":
+        status = "human_review_approved"
+    elif request.action == "reject":
+        status = "human_review_rejected"
+    else:
+        status = "escalated_to_supervisor"
+
+    return HumanReviewResponse(
+        claim_id=claim_id,
+        action=request.action,
+        status=status,
+        reviewer_notes=request.reviewer_notes,
+    )
