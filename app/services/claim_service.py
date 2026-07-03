@@ -99,6 +99,8 @@ def create_claim_decision(request: ClaimIntakeRequest, db: Session,) -> ClaimDec
 
     workflow_state = run_claim_workflow(initial_state)
     
+    validate_workflow_output(workflow_state)
+    
     logger.info(
     "claim_decision_workflow_completed claim_id=%s status=%s risk_level=%s requires_human_review=%s",
     workflow_state.claim_id,

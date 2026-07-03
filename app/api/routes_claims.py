@@ -1,13 +1,10 @@
 """
-Claims API routes for ClaimAssistant.
+Claims API routes for ClaimAssist.
 
 This module exposes HTTP endpoints for claim intake.
 The API layer should stay thin: it receives requests, validates schemas,
 and calls services or workflow orchestration.
 """
-
-from uuid import uuid4
-from fastapi import APIRouter
 
 from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse, HumanReviewRequest, HumanReviewResponse
 from app.services.claim_service import create_claim_intake, create_claim_decision, get_claim_by_id, get_claim_audit_logs, record_human_review
@@ -21,7 +18,7 @@ router = APIRouter(prefix="/claims", tags=["claims"])
 
 
 @router.post("", response_model=ClaimIntakeResponse)
-def create_claim(request: ClaimIntakeRequest, db: Session = Depends(get_db_session),) -> ClaimIntakeResponse:
+def create_claim(request: ClaimIntakeRequest) -> ClaimIntakeResponse:
     """
     Receive a claim intake request and return the workflow decision output.
 

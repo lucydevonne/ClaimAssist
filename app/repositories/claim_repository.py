@@ -130,3 +130,33 @@ def update_claim_status(
     db.refresh(claim)
 
     return claim
+
+def update_claim_status(
+    db: Session,
+    claim_id: str,
+    status: str,
+) -> Claim | None:
+    """
+    Update the status of a stored claim.
+
+    Current behavior:
+    - Finds a claim by claim_id.
+    - Updates the claim status.
+    - Saves the change to PostgreSQL.
+
+    Future production behavior:
+    - Enforce valid workflow status transitions.
+    - Store reviewer metadata and approval history.
+    """
+
+    claim = db.get(Claim, claim_id)
+
+    if claim is None:
+        return None
+
+    claim.status = status
+
+    db.commit()
+    db.refresh(claim)
+
+    return claim
