@@ -4,7 +4,7 @@ Human review API tests for ClaimAssist.
 These tests verify that human-in-the-loop review actions update stored
 claims and create traceable review outcomes.
 """
-
+from app.database.models import Claim
 
 def test_submit_human_review_returns_review_status(client) -> None:
     """
@@ -50,3 +50,37 @@ def test_submit_human_review_returns_review_status(client) -> None:
     assert data["action"] == "escalate"
     assert data["status"] == "escalated_to_supervisor"
     assert data["reviewer_notes"] == "High-risk claim needs supervisor review."
+    
+def test_human_review_updates_claim_status_in_database(client, db_session,) -> None:
+    """
+    Verify that a human review action updates the stored claim status.
+    """
+
+    claim_payload = {
+        "claimant_name": "Jane Doe",
+        "claim_type": "workers_compensation",
+        "date_of_loss": "2026-07-02",
+        "incident_description": (
+            "Employee reported severe injury and possible surgery "
+            "after a workplace incident."
+        ),
+    }
+
+    claim_response = client.post("/claims/decision", json=claim_payload)
+    claim_id = claim_response.json()["claim_id"]
+
+    review_payload = {
+        "action": "approve",
+        "reviewer_notes": "Reviewed and approved by examiner.",
+    }
+
+    response = client.post(
+        f"/claims/{claim_id}/human-review",
+        json=review_payload,
+    )
+
+    saved_claim = db_session.get(Claim, claim_id)
+
+    assert response.status_code == 200
+    assert saved_claim is not None
+    assert saved_claim.status == "human_review_approved"
