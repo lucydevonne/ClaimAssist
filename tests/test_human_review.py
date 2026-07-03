@@ -129,3 +129,22 @@ def test_human_review_creates_audit_log(client,db_session,) -> None:
     assert audit_log.details["action"] == "escalate"
     assert audit_log.details["status"] == "escalated_to_supervisor"
     assert audit_log.details["reviewer_notes"] == "Escalated for supervisor review."
+    
+
+def test_human_review_returns_404_for_missing_claim(client) -> None:
+    """
+    Verify that human review cannot be submitted for a missing claim.
+    """
+
+    payload = {
+        "action": "approve",
+        "reviewer_notes": "Trying to review a claim that does not exist.",
+    }
+
+    response = client.post(
+        "/claims/CLM-MISSING123/human-review",
+        json=payload,
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Claim not found."
