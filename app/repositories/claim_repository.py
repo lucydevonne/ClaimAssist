@@ -89,3 +89,44 @@ def get_claim_record_by_id(
     """
 
     return db.get(Claim, claim_id)
+
+
+def update_claim_status(
+    db: Session,
+    claim_id: str,
+    status: str,
+) -> Claim | None:
+    """
+    Update the status of a stored claim.
+
+    Args:
+        db: Active SQLAlchemy database session.
+        claim_id: Primary key of the claim record.
+        status: New claim workflow status.
+
+    Returns:
+        The updated Claim database model if found, otherwise None.
+
+    Current behavior:
+    - Retrieves a claim by primary key.
+    - Updates the claim status.
+    - Commits the database transaction.
+    - Refreshes the updated model.
+
+    Future production behavior:
+    - Update additional human-review fields.
+    - Store reviewer identity and approval metadata.
+    - Enforce status transition rules for regulated claims workflows.
+    """
+
+    claim = db.get(Claim, claim_id)
+
+    if claim is None:
+        return None
+
+    claim.status = status
+
+    db.commit()
+    db.refresh(claim)
+
+    return claim

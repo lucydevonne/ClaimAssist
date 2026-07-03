@@ -14,7 +14,7 @@ from app.graph.workflow import run_claim_workflow
 from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse
 
 from app.repositories.audit_repository import create_audit_log_record, get_audit_logs_by_claim_id
-from app.repositories.claim_repository import create_claim_record, get_claim_record_by_id
+from app.repositories.claim_repository import create_claim_record, get_claim_record_by_id, update_claim_status
 
 from app.services.audit_service import create_audit_event
 
@@ -219,19 +219,21 @@ def record_human_review(
     claim_id: str,
     request: HumanReviewRequest,
     db: Session,
-) -> HumanReviewResponse:
+) -> HumanReviewResponse | None:
     """
     Record a human review decision for a claim.
 
     Current behavior:
-    - Accepts a human reviewer action.
+    - Fetches the claim from PostgreSQL.
+    - Updates claim status based on reviewer action.
+    - Creates and saves a human-review audit event.
     - Returns a structured human review response.
 
     Future production behavior:
-    - Fetch the claim from PostgreSQL.
-    - Update claim status based on reviewer action.
-    - Save the human review decision to a human_reviews table.
-    - Create an audit log event for the human review action.
+    - Save human review records to a dedicated human_reviews table.
+    - Store reviewer identity, role, timestamp, and override reason.
+    - Enforce role-based access control for examiner decisions.
+    - Add supervisor approval chains for escalated claims.
     """
 
     if request.action == "approve":
@@ -241,9 +243,33 @@ def record_human_review(
     else:
         status = "escalated_to_supervisor"
 
+    updated_claim = update_claim_status(
+        db=db,
+        claim_id=claim_id,
+        status=status,
+    )
+
+    if updated_claim is None:
+        return None
+
+    audit_event = create_audit_event(
+        claim_id=claim_id,
+        event_type="human_review_recorded",
+        details={
+            "action": request.action.value,
+            "status": status,
+            "reviewer_notes": request.reviewer_notes,
+        },
+    )
+
+    create_audit_log_record(
+        db=db,
+        audit_event=audit_event,
+    )
+
     return HumanReviewResponse(
         claim_id=claim_id,
         action=request.action,
         status=status,
         reviewer_notes=request.reviewer_notes,
-    )
+    )   

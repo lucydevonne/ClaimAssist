@@ -129,17 +129,26 @@ def submit_human_review(
     Current behavior:
     - Reads claim_id from the URL path.
     - Validates the reviewer action and notes.
+    - Updates the stored claim status in PostgreSQL.
+    - Persists a human-review audit event.
     - Returns a structured review response.
 
     Future production behavior:
-    - Confirm the claim exists in PostgreSQL.
-    - Persist the human review record.
-    - Write a human-review audit event.
+    - Persist human review records in a dedicated table.
     - Enforce examiner authentication and permissions.
+    - Return the full human review timeline.
     """
 
-    return record_human_review(
+    review_response = record_human_review(
         claim_id=claim_id,
         request=request,
         db=db,
     )
+
+    if review_response is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Claim not found.",
+        )
+
+    return review_response
