@@ -1,5 +1,5 @@
 """
-Database models for ClaimAssistant.
+Database models for ClaimAssist.
 
 This module defines the SQLAlchemy ORM models that will map Python classes
 to PostgreSQL tables.
@@ -16,7 +16,7 @@ Future production behavior:
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Boolean, Date, DateTime, Float, String, Text
+from sqlalchemy import Boolean, Date, DateTime, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -25,7 +25,7 @@ class Base(DeclarativeBase):
     """
     Base class for all SQLAlchemy models.
 
-    Every database model in ClaimAssistant will inherit from this class
+    Every database model in ClaimAssist will inherit from this class
     so SQLAlchemy can discover and map it to a database table.
     """
 
@@ -39,7 +39,7 @@ class Claim(Base):
     Future production use:
     - Store claim intake data from POST /claims.
     - Link claim records to workflow state, documents, audit logs,
-      and final examiner decisions.
+      and final examiner decisions
     """
 
     __tablename__ = "claims"
@@ -95,6 +95,37 @@ class AuditLog(Base):
     claim_id: Mapped[str] = mapped_column(String, nullable=False)
     event_type: Mapped[str] = mapped_column(String(150), nullable=False)
     details: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+    
+class HumanReview(Base):
+    """
+    Human review decision stored for a claim.
+
+    Current behavior:
+    - Stores examiner action and notes for a claim.
+    - Links the review to a claim ID.
+
+    Future production behavior:
+    - Store reviewer user ID.
+    - Add role-based approval metadata.
+    - Support multiple review rounds per claim.
+    """
+
+    __tablename__ = "human_reviews"
+
+    id: Mapped[str] = mapped_column(
+        String,
+        primary_key=True,
+        default=lambda: f"HRV-{uuid4().hex[:10].upper()}",
+    )
+    claim_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    action: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[str] = mapped_column(String, nullable=False)
+    reviewer_notes: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

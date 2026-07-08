@@ -15,6 +15,7 @@ from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDeci
 
 from app.repositories.audit_repository import create_audit_log_record, get_audit_logs_by_claim_id
 from app.repositories.claim_repository import create_claim_record, get_claim_record_by_id, update_claim_status
+from app.repositories.human_review_repository import create_human_review_record
 
 from app.services.audit_service import create_audit_event
 
@@ -228,11 +229,11 @@ def record_human_review(
     Current behavior:
     - Fetches the claim from PostgreSQL.
     - Updates claim status based on reviewer action.
+    - Saves the review decision to the human_reviews table.
     - Creates and saves a human-review audit event.
     - Returns a structured human review response.
 
     Future production behavior:
-    - Save human review records to a dedicated human_reviews table.
     - Store reviewer identity, role, timestamp, and override reason.
     - Enforce role-based access control for examiner decisions.
     - Add supervisor approval chains for escalated claims.
@@ -253,6 +254,14 @@ def record_human_review(
 
     if updated_claim is None:
         return None
+
+    create_human_review_record(
+        db=db,
+        claim_id=claim_id,
+        action=request.action.value,
+        status=status,
+        reviewer_notes=request.reviewer_notes,
+    )
 
     audit_event = create_audit_event(
         claim_id=claim_id,

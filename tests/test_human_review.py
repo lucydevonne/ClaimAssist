@@ -4,11 +4,9 @@ Human review API tests for ClaimAssist.
 These tests verify that human-in-the-loop review actions update stored
 claims and create traceable review outcomes.
 """
-from app.database.models import Claim
-
 from sqlalchemy import select
 
-from app.database.models import AuditLog
+from app.database.models import AuditLog, Claim, HumanReview
 
 def test_submit_human_review_returns_review_status(client) -> None:
     """
@@ -129,7 +127,47 @@ def test_human_review_creates_audit_log(client,db_session,) -> None:
     assert audit_log.details["action"] == "escalate"
     assert audit_log.details["status"] == "escalated_to_supervisor"
     assert audit_log.details["reviewer_notes"] == "Escalated for supervisor review."
-    
+
+
+def test_human_review_persists_review_record_in_database(client, db_session) -> None:
+    """
+    Verify that a human review action is saved to the human_reviews table.
+    """
+
+    claim_payload = {
+        "claimant_name": "Jane Doe",
+        "claim_type": "workers_compensation",
+        "date_of_loss": "2026-07-02",
+        "incident_description": (
+            "Employee reported severe injury and possible surgery "
+            "after a workplace incident."
+        ),
+    }
+
+    claim_response = client.post("/claims/decision", json=claim_payload)
+    claim_id = claim_response.json()["claim_id"]
+
+    review_payload = {
+        "action": "reject",
+        "reviewer_notes": "Insufficient documentation to approve.",
+    }
+
+    response = client.post(
+        f"/claims/{claim_id}/human-review",
+        json=review_payload,
+    )
+
+    human_review = db_session.execute(
+        select(HumanReview).where(HumanReview.claim_id == claim_id)
+    ).scalar_one_or_none()
+
+    assert response.status_code == 200
+    assert human_review is not None
+    assert human_review.claim_id == claim_id
+    assert human_review.action == "reject"
+    assert human_review.status == "human_review_rejected"
+    assert human_review.reviewer_notes == "Insufficient documentation to approve."
+
 
 def test_human_review_returns_404_for_missing_claim(client) -> None:
     """
