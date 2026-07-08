@@ -6,8 +6,8 @@ The API layer should stay thin: it receives requests, validates schemas,
 and calls services or workflow orchestration.
 """
 
-from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse, HumanReviewRequest, HumanReviewResponse
-from app.services.claim_service import create_claim_intake, create_claim_decision, get_claim_by_id, get_claim_audit_logs, record_human_review
+from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse, HumanReviewRequest, HumanReviewResponse, HumanReviewRecordResponse
+from app.services.claim_service import create_claim_intake, create_claim_decision, get_claim_by_id, get_claim_audit_logs, record_human_review, get_claim_human_reviews
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -149,3 +149,17 @@ def submit_human_review(
         )
 
     return review_response
+
+@router.get("/{claim_id}/human-reviews", response_model=list[HumanReviewRecordResponse])
+def read_claim_human_reviews(
+    claim_id: str,
+    db: Session = Depends(get_db_session),
+) -> list[HumanReviewRecordResponse]:
+    """
+    Retrieve human review history linked to a claim.
+    """
+
+    return get_claim_human_reviews(
+        claim_id=claim_id,
+        db=db,
+    )

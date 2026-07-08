@@ -11,11 +11,11 @@ from sqlalchemy.orm import Session
 
 from app.agents.intake_agent import create_initial_claim_state
 from app.graph.workflow import run_claim_workflow
-from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse
+from app.schemas.claim import ClaimIntakeRequest, ClaimIntakeResponse, ClaimDecisionResponse, ClaimRecordResponse, ClaimAuditLogResponse, HumanReviewRecordResponse
 
 from app.repositories.audit_repository import create_audit_log_record, get_audit_logs_by_claim_id
 from app.repositories.claim_repository import create_claim_record, get_claim_record_by_id, update_claim_status
-from app.repositories.human_review_repository import create_human_review_record
+from app.repositories.human_review_repository import create_human_review_record, get_human_reviews_by_claim_id
 
 from app.services.audit_service import create_audit_event
 
@@ -284,3 +284,28 @@ def record_human_review(
         status=status,
         reviewer_notes=request.reviewer_notes,
     )   
+    
+def get_claim_human_reviews(
+    claim_id: str,
+    db: Session,
+) -> list[HumanReviewRecordResponse]:
+    """
+    Retrieve saved human review history for a claim.
+    """
+
+    human_reviews = get_human_reviews_by_claim_id(
+        db=db,
+        claim_id=claim_id,
+    )
+
+    return [
+        HumanReviewRecordResponse(
+            review_id=review.id,
+            claim_id=review.claim_id,
+            action=review.action,
+            status=review.status,
+            reviewer_notes=review.reviewer_notes,
+            created_at=review.created_at,
+        )
+        for review in human_reviews
+    ]

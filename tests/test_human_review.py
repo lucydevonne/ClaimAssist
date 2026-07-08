@@ -186,3 +186,41 @@ def test_human_review_returns_404_for_missing_claim(client) -> None:
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Claim not found."
+    
+def test_get_human_reviews_returns_saved_review_history(client) -> None:
+    """
+    Verify that saved human review history can be retrieved.
+    """
+
+    claim_payload = {
+        "claimant_name": "Jane Doe",
+        "claim_type": "workers_compensation",
+        "date_of_loss": "2026-07-02",
+        "incident_description": (
+            "Employee reported severe injury and possible surgery "
+            "after a workplace incident."
+        ),
+    }
+
+    claim_response = client.post("/claims/decision", json=claim_payload)
+    claim_id = claim_response.json()["claim_id"]
+
+    review_payload = {
+        "action": "escalate",
+        "reviewer_notes": "Escalated for supervisor review.",
+    }
+
+    client.post(
+        f"/claims/{claim_id}/human-review",
+        json=review_payload,
+    )
+
+    response = client.get(f"/claims/{claim_id}/human-reviews")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert len(data) == 1
+    assert data[0]["claim_id"] == claim_id
+    assert data[0]["action"] == "escalate"
+    assert data[0]["status"] == "escalated_to_supervisor"
+    assert data[0]["reviewer_notes"] == "Escalated for supervisor review."

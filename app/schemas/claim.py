@@ -235,3 +235,15 @@ class HumanReviewResponse(BaseModel):
     action: HumanReviewAction = Field(..., description="Recorded review action.")
     status: str = Field(..., description="Updated claim review status.")
     reviewer_notes: str = Field(..., description="Notes from the human reviewer.")
+    
+class HumanReviewRecordResponse(BaseModel):
+    """
+    Response returned for a saved human review record.
+    """
+
+    review_id: str
+    claim_id: str
+    action: HumanReviewAction
+    status: str
+    reviewer_notes: str
+    created_at: datetime
